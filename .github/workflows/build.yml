@@ -1,0 +1,48 @@
+name: Build
+
+defaults:
+  run:
+    working-directory: src
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore -c Release
+
+  release:
+    # builds a self-contained Windows .exe; attach it to a GitHub release by pushing a tag like v1.0.0
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Publish win-x64
+      run: dotnet publish KnightShiftMinimapGeneratorRunner/KnightShiftMinimapGeneratorRunner.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ../publish
+    - name: Zip
+      working-directory: publish
+      run: zip ../KnightShiftMinimapGenerator-win-x64.zip KnightShiftMinimapGenerator.exe
+    - uses: softprops/action-gh-release@v2
+      with:
+        files: KnightShiftMinimapGenerator-win-x64.zip

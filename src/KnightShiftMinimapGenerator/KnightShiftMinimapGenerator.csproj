@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>KnightShiftMinimapGenerator.Core</AssemblyName>
+    <RootNamespace>KnightShiftMinimapGenerator</RootNamespace>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <Version>1.0.0</Version>
+    <Authors>A-t-l-as</Authors>
+    <Description>KnightShift minimap generator and .lnd/.mis reader/writer. Based on EarthMinimapGenerator by GvardianDLVII.</Description>
+    <Copyright>Copyright (c) 2022 GvardianDLVII, Copyright (c) 2026 A-t-l-as</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/A-t-l-as/KnightShiftMinimapGenerator</RepositoryUrl>
+    <PackageTags>knightshift polanie2 reality-pump minimap lnd mis</PackageTags>
+  </PropertyGroup>
+
+</Project>
