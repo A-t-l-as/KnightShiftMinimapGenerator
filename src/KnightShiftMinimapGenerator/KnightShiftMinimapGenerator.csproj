@@ -6,7 +6,7 @@
     <RootNamespace>KnightShiftMinimapGenerator</RootNamespace>
     <Nullable>disable</Nullable>
     <LangVersion>latest</LangVersion>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <Authors>A-t-l-as</Authors>
     <Description>KnightShift minimap generator and .lnd/.mis reader/writer. Based on EarthMinimapGenerator by GvardianDLVII.</Description>
     <Copyright>Copyright (c) 2022 GvardianDLVII, Copyright (c) 2026 A-t-l-as</Copyright>

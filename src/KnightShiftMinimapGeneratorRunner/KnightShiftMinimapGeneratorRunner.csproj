@@ -7,7 +7,9 @@
     <RootNamespace>KnightShiftMinimapGenerator.Runner</RootNamespace>
     <Nullable>disable</Nullable>
     <LangVersion>latest</LangVersion>
-    <Version>1.0.0</Version>
+    <!-- no ICU needed: the self-contained build also runs on minimal Linux systems -->
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <Version>1.1.0</Version>
     <Authors>A-t-l-as</Authors>
     <Copyright>Copyright (c) 2022 GvardianDLVII, Copyright (c) 2026 A-t-l-as</Copyright>
   </PropertyGroup>

@@ -18,7 +18,18 @@ Based on [EarthMinimapGenerator](https://github.com/GvardianDLVII/EarthMinimapGe
 
 ## Download / building
 
-Prebuilt Windows binaries (if published) are on the [Releases](https://github.com/A-t-l-as/KnightShiftMinimapGenerator/releases) page.
+Prebuilt executables are on the [Releases](https://github.com/A-t-l-as/KnightShiftMinimapGenerator/releases) page.
+They are self-contained single files, no .NET installation is needed:
+
+| system | file |
+|---|---|
+| Windows (64-bit / ARM) | `...-win-x64.zip` / `...-win-arm64.zip` |
+| Linux (64-bit / ARM) | `...-linux-x64.tar.gz` / `...-linux-arm64.tar.gz` |
+| macOS (Intel / Apple Silicon) | `...-osx-x64.tar.gz` / `...-osx-arm64.tar.gz` |
+
+On Linux and macOS run it from a terminal: `./KnightShiftMinimapGenerator --help`.
+The macOS build is not signed, so the first time macOS may block it; allow it in
+*System Settings → Privacy & Security* or run `xattr -d com.apple.quarantine KnightShiftMinimapGenerator`.
 
 To build from source you need the [.NET 8 SDK](https://dotnet.microsoft.com/download):
 
@@ -29,12 +40,14 @@ dotnet build -c Release
 
 Executable: `src/KnightShiftMinimapGeneratorRunner/bin/Release/net8.0/KnightShiftMinimapGenerator.exe`
 
-Single-file Windows executable:
+Single-file executable (replace `win-x64` with `linux-x64`, `osx-arm64`, ... for other systems):
 
 ```
 cd src
 dotnet publish KnightShiftMinimapGeneratorRunner -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ../publish
 ```
+
+Pushing a tag `v*` (e.g. `v1.1.0`) makes GitHub Actions build all six platforms and publish them as a release; the program version is taken from the tag.
 
 Run the program without arguments (or with `--help`) to see all modes and options.
 

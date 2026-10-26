@@ -26,23 +26,66 @@ jobs:
     - name: Build
       run: dotnet build --no-restore -c Release
 
-  release:
-    # builds a self-contained Windows .exe; attach it to a GitHub release by pushing a tag like v1.0.0
+  publish:
+    # self-contained single-file executables for every platform (no .NET installation needed)
     if: startsWith(github.ref, 'refs/tags/v')
     needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - { rid: win-x64,     os: ubuntu-latest }
+          - { rid: win-arm64,   os: ubuntu-latest }
+          - { rid: linux-x64,   os: ubuntu-latest }
+          - { rid: linux-arm64, os: ubuntu-latest }
+          # macOS builds run on a Mac: the SDK ad-hoc signs the executable there,
+          # unsigned binaries are killed on Apple Silicon
+          - { rid: osx-x64,     os: macos-latest }
+          - { rid: osx-arm64,   os: macos-latest }
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    - name: Publish win-x64
-      run: dotnet publish KnightShiftMinimapGeneratorRunner/KnightShiftMinimapGeneratorRunner.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ../publish
-    - name: Zip
-      working-directory: publish
-      run: zip ../KnightShiftMinimapGenerator-win-x64.zip KnightShiftMinimapGenerator.exe
+    - name: Publish ${{ matrix.rid }}
+      # the program version is taken from the tag (v1.2.3 -> 1.2.3)
+      run: >
+        dotnet publish KnightShiftMinimapGeneratorRunner/KnightShiftMinimapGeneratorRunner.csproj
+        -c Release -r ${{ matrix.rid }} --self-contained true
+        -p:Version=${GITHUB_REF_NAME#v}
+        -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true
+        -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=none
+        -o ../publish/${{ matrix.rid }}
+    - name: Package
+      working-directory: publish/${{ matrix.rid }}
+      run: |
+        cp ../../LICENSE ../../README.md .
+        name=KnightShiftMinimapGenerator-${{ github.ref_name }}-${{ matrix.rid }}
+        if [[ "${{ matrix.rid }}" == win-* ]]; then
+          zip -9 ../../$name.zip *
+        else
+          chmod +x KnightShiftMinimapGenerator
+          tar -czf ../../$name.tar.gz *
+        fi
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.rid }}
+        path: |
+          KnightShiftMinimapGenerator-*.zip
+          KnightShiftMinimapGenerator-*.tar.gz
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        path: dist
+        merge-multiple: true
     - uses: softprops/action-gh-release@v2
       with:
-        files: KnightShiftMinimapGenerator-win-x64.zip
+        files: dist/*
+        generate_release_notes: true
